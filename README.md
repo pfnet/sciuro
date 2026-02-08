@@ -190,14 +190,22 @@ $ kubectl get node worker01 -o json | jq '.status.conditions[] | select(.type | 
 ```
 
 # Building
-Sciuro is built and tested with [bazel](https://bazel.build/). To run tests:
+To run tests:
 ```
 make test
 ```
 
-To build and push images, define the docker repository base with the run of the
-manifests targets:
+To build images:
 ```
-bazel run --define repo=quay.io/myrepo  //manifests:cluster > /tmp/cluster.yaml
-bazel run --define repo=quay.io/myrepo  //manifests:stable > /tmp/stable.yaml
+make build
+```
+
+To push images:
+```
+make push
+```
+
+To generate manifests:
+```
+make manifests
 ```

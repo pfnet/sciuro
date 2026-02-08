@@ -17,17 +17,15 @@ jobs:
           fetch-depth: 0
       - run: |
           git fetch --tags --force
-      - uses: bazel-contrib/setup-bazel@0.14.0
-        with:
-          bazelisk-cache: true
-          repository-cache: true
-      - run: bazel --bazelrc=tools/ci.bazelrc run //manifests:stable  > stable.yaml
-      - run: bazel --bazelrc=tools/ci.bazelrc run //manifests:cluster > cluster.yaml
-      - name: Release
+      - run: make build
+      - run: make manifests
+      - name: Push image
+        run: make push
+      - name: Release manifests
         uses: softprops/action-gh-release@v1
         with:
           files: |
-            stable.yaml
-            cluster.yaml
+            out/stable.yaml
+            out/cluster.yaml
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
