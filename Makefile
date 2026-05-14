@@ -1,5 +1,8 @@
-PROJECT = sciuro
-MODULE = github.com/cloudflare/$(PROJECT)
+TAG := $(shell git describe --tags --always --dirty)
+IMG ?= docker.io/cloudflare/sciuro:$(TAG)
+
+DOCKER_BUILD ?= docker build --progress=plain
+OUTPUT_DIR ?= out
 
 .PHONY: default
 default: build;
@@ -7,41 +10,40 @@ default: build;
 .PHONY: clean
 clean:
 	@echo cleaning build targets
-	@rm -rf bin coverage.txt
-
-.PHONY: clean-bazel
-clean-bazel:
-	@echo cleaning bazel build targets
-	@./tools/bazel clean
+	@rm -rf $(OUTPUT_DIR)
 
 .PHONY: check
 check:
 	@echo running checks
-	# TODO: Not well incorporated into bazel
-	@golangcilint run ./...
-
-.PHONY: dep-fix
-dep-fix:
-	@echo fixing dependencies
-	@./tools/bazel run //:gazelle -- fix
+	@$(DOCKER_BUILD) --target check .
 
 .PHONY: dep-update
-dep-update: go.sum
+dep-update:
 	@echo updating dependencies
-	@go mod tidy
-	@./tools/bazel run //:gazelle -- update-repos -from_file=go.mod -prune=true -to_macro=gazelle.bzl%deps
+	@$(DOCKER_BUILD) --target export-dep-update --output . .
 
 .PHONY: test
 test:
-	@echo unit testing with Bazel
-	@./tools/bazel test //...
+	@echo unit testing
+	$(DOCKER_BUILD) --target test .
 
 .PHONY: test-coverage
 test-coverage:
 	@echo unit testing with coverage
-	@go test -coverprofile=coverage.txt -mod=readonly -covermode=atomic $(MODULE)/...
+	$(DOCKER_BUILD) --target export-test-coverage --output $(OUTPUT_DIR) .
 
 .PHONY: build
 build:
 	@echo building cmds and images
-	@./tools/bazel build //cmd/...
+	@$(DOCKER_BUILD) --target export --output $(OUTPUT_DIR) .
+	@$(DOCKER_BUILD) -t $(IMG) .
+
+.PHONY: manifests
+manifests:
+	@echo generating manifests
+	@$(DOCKER_BUILD) --build-arg TAG=$(TAG) --target export-manifests --output $(OUTPUT_DIR) .
+
+.PHONY: push
+push:
+	@echo pushing images
+	@docker push $(IMG)
