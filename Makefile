@@ -1,5 +1,5 @@
 TAG := $(shell git describe --tags --always --dirty)
-IMG ?= docker.io/cloudflare/sciuro:$(TAG)
+IMG ?= ghcr.io/pfnet/sciuro:$(TAG)
 
 DOCKER_BUILD ?= docker build --progress=plain
 OUTPUT_DIR ?= out

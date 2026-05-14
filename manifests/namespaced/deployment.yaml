@@ -18,7 +18,7 @@ spec:
       restartPolicy: Always
       containers:
         - name: sciuro
-          image: docker.io/cloudflare/sciuro
+          image: ghcr.io/pfnet/sciuro
           imagePullPolicy: IfNotPresent
           resources:
             limits:

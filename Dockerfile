@@ -44,7 +44,7 @@ WORKDIR /work
 COPY manifests ./manifests
 RUN set -x && \
     cd manifests/namespaced && \
-    kustomize edit set image docker.io/cloudflare/sciuro:${TAG} && \
+    kustomize edit set image ghcr.io/pfnet/sciuro:${TAG} && \
     kustomize build >/stable.yaml
 RUN set -x && \
     cd manifests/non-namespaced && \
