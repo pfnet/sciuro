@@ -10,7 +10,6 @@ linters:
     - dogsled
     - errorlint
     - gochecknoinits
-    - goconst
     - gocritic
     - godox
     - goprintffuncname

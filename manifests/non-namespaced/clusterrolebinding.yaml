@@ -9,4 +9,4 @@ roleRef:
 subjects:
 - kind: ServiceAccount
   name: sciuro
-  namespace: kube-system
+  namespace: node-remediation
