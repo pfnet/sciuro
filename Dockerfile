@@ -1,7 +1,7 @@
 # https://hub.docker.com/_/alpine
-FROM docker.io/alpine:3.23.4@sha256:5b10f432ef3da1b8d4c7eb6c487f2f5a8f096bc91145e68878dd4a5019afde11 AS alpine-base
+FROM docker.io/alpine:3.24.1@sha256:28bd5fe8b56d1bd048e5babf5b10710ebe0bae67db86916198a6eec434943f8b AS alpine-base
 
-FROM docker.io/golang:1.26.3 AS base
+FROM docker.io/golang:1.26.7 AS base
 WORKDIR /work
 COPY go.mod go.sum ./
 RUN go mod download
@@ -18,7 +18,7 @@ RUN --mount=type=cache,target=/root/.cache/go-build \
 FROM scratch AS export-test-coverage
 COPY --from=test-coverage /coverage.txt /
 
-FROM docker.io/golangci/golangci-lint:v2.12.2 AS golangci-lint
+FROM docker.io/golangci/golangci-lint:v2.13.1 AS golangci-lint
 FROM base AS check
 COPY --from=golangci-lint /usr/bin/golangci-lint /usr/bin/
 RUN --mount=type=cache,target=/root/.cache/go-build \
